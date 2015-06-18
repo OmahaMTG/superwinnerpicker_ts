@@ -1,1 +1,1 @@
-# superwinnerpicker_ts 
+[Creating a TypeScript Workflow with Gulp](http://weblogs.asp.net/dwahlin/creating-a-typescript-workflow-with-gulp_)
