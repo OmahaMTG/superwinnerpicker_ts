@@ -47,7 +47,7 @@ gulp.task('compile-ts', function () {
                            target: 'ES5',
                            declarationFiles: false,
                            noExternalResolve: true, 
-                           out : 'output.js'
+                           out : 'kong.js'
                        }));
 
         tsResult.dts.pipe(gulp.dest(config.tsOutputPath));

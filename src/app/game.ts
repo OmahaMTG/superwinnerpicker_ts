@@ -4,19 +4,18 @@
 class SimpleGame {
 
     constructor() {
-        this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'content', { preload: this.preload, create: this.create });
-        this.platform = new Platform(this.game);
+        this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'stage', { preload: this.preload, create: this.create });
     }
 
     game: Phaser.Game;
     platform : Platform;
 
     preload() {
-        this.game.load.image('platform', 'dist/img/platform.png');
+        this.game.load.image('platform', 'src/img/platform.png');
     }
 
     create() {
-
+        this.platform = new Platform(this.game);
     }
 
 }
