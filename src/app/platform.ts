@@ -6,9 +6,11 @@ class Platform extends Phaser.Group{
     private spaceBetweenPlatforms = 120;
     private kongPlatformSpace = 200;
     private rowHeightOffset: number;
+    public gameRowHeights: number[] = [];
+    public kongRowHeight: number;
 
     calculateTotalRows() : number {
-        return (this.game.height - this.platformHeight - this.kongPlatformSpace) / this.spaceBetweenPlatforms;
+        return Math.floor((this.game.height - this.platformHeight - this.kongPlatformSpace) / this.spaceBetweenPlatforms);
     }
 
     calculateTotalColumns() : number {
@@ -24,16 +26,17 @@ class Platform extends Phaser.Group{
     }
 
     createMainPlaforms() {
-             console.log('adding platform Rows : ' + this.calculateTotalRows());
-            for (var row = 0; row < this.calculateTotalRows(); row++) {
+        console.log('adding %s platform Rows', this.calculateTotalRows());
+        for (var row = 0; row < this.calculateTotalRows(); row++) {
 
-                for (var column = 0; column < this.calculateTotalColumns(); column++) {
-                    var ground = this.create(column * (15 * 3),  this.rowHeightOffset, 'platform');
-                    ground.scale.setTo(3, 3);
-                    ground.body.immovable = true;
-                }
-                this.rowHeightOffset -= this.spaceBetweenPlatforms;
+            for (var column = 0; column < this.calculateTotalColumns(); column++) {
+                var ground = this.create(column * (15 * 3),  this.rowHeightOffset, 'platform');
+                ground.scale.setTo(3, 3);
+                ground.body.immovable = true;
             }
+            this.gameRowHeights.push(this.rowHeightOffset);
+            this.rowHeightOffset -= this.spaceBetweenPlatforms;
+        }
     }
 
     createKongPlatform() {
@@ -42,5 +45,7 @@ class Platform extends Phaser.Group{
             ground.scale.setTo(3, 3);
             ground.body.immovable = true;
         }
+        console.log('setting kongRowHeight to %s', this.rowHeightOffset);
+        this.kongRowHeight = this.rowHeightOffset;
     }
 }
