@@ -6,4 +6,6 @@
 	
 /// <reference path="../../src/app/platform.ts" />
 	
+/// <reference path="../../src/app/winnerCount.ts" />
+	
 //}

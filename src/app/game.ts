@@ -10,6 +10,7 @@ class WinnerPicker {
     game: Phaser.Game;
     platform : Platform;
     kong : Kong;
+    winnerCount : WinnerCount;
 
     preload() {
         this.game.load.image('platform', 'src/img/platform.png');
@@ -20,11 +21,15 @@ class WinnerPicker {
         this.platform = new Platform(this.game);
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
+
+        this.winnerCount = new WinnerCount(this.game, 10);
+        this.game.add.existing(this.winnerCount);
+
     }
 
     update() {
         this.game.physics.arcade.collide(this.kong, this.platform);
-       // this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.winnerCount.CheckKeys();
     }
 }
 

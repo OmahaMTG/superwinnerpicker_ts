@@ -68,6 +68,43 @@ var Platform = (function (_super) {
 })(Phaser.Group);
 ///<reference path="../../tools/typings/tsd.d.ts" />
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
+var WinnerCount = (function (_super) {
+    __extends(WinnerCount, _super);
+    function WinnerCount(game, maxWinners) {
+        this.helpText = 'Up/Down to chose number of Winners. \n  Space to draw Winners. \n # of Winners to draw = ';
+        var locationY = 10;
+        var locationX = game.width - 300;
+        _super.call(this, game, locationX, locationY, this.helpText + '01', { font: '15px Arial', fill: '#ffffff', align: 'right' });
+        this.numberOfWinnersToGet = 1;
+        this.UpdateNumber(0);
+        this.maxWinners = maxWinners;
+        this.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+    }
+    WinnerCount.prototype.UpdateNumber = function (updateAmount) {
+        var newNumberOfWinnersToGet = this.numberOfWinnersToGet + updateAmount;
+        if (newNumberOfWinnersToGet <= this.maxWinners && newNumberOfWinnersToGet >= 1) {
+            this.numberOfWinnersToGet = newNumberOfWinnersToGet;
+            if (this.numberOfWinnersToGet <= 9) {
+                this.text = this.helpText + '0' + this.numberOfWinnersToGet.toString();
+            }
+            else {
+                this.text = this.helpText + this.numberOfWinnersToGet.toString();
+            }
+        }
+    };
+    WinnerCount.prototype.CheckKeys = function () {
+        if (this.upKey.justDown) {
+            this.UpdateNumber(1);
+        }
+        else if (this.downKey.justDown) {
+            this.UpdateNumber(-1);
+        }
+    };
+    return WinnerCount;
+})(Phaser.Text);
+///<reference path="../../tools/typings/tsd.d.ts" />
+///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var WinnerPicker = (function () {
     function WinnerPicker(width) {
         this.game = new Phaser.Game(width, 600, Phaser.AUTO, 'stage', { preload: this.preload, create: this.create, update: this.update });
@@ -80,10 +117,12 @@ var WinnerPicker = (function () {
         this.platform = new Platform(this.game);
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
+        this.winnerCount = new WinnerCount(this.game, 10);
+        this.game.add.existing(this.winnerCount);
     };
     WinnerPicker.prototype.update = function () {
         this.game.physics.arcade.collide(this.kong, this.platform);
-        // this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.winnerCount.CheckKeys();
     };
     return WinnerPicker;
 })();
