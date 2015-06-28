@@ -24,6 +24,85 @@ var Kong = (function (_super) {
 })(Phaser.Sprite);
 ///<reference path="../../tools/typings/tsd.d.ts" />
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
+var Mario = (function (_super) {
+    __extends(Mario, _super);
+    function Mario(game, platformHeights) {
+        _super.call(this, game, 50, game.height - 80, 'mario');
+        this.platformHights = platformHeights;
+        this.scale.set(3, 3);
+        this.game.physics.arcade.enableBody(this);
+        this.game.physics.arcade.enable;
+        this.arcadeBody = this.body;
+        this.arcadeBody.gravity.y = 300;
+        this.animations.add('hammer', [5, 7, 6, 8], 8, true);
+        this.animations.add('ready', [5], 8, true);
+        this.animations.play('ready', 8, true);
+        this.anchor.setTo(.5, .5);
+        this.scale.x *= -1;
+        this.isSmashing = false;
+        this.checkWorldBounds = true;
+        this.events.onOutOfBounds.add(this.ReachedEndOfPlatform, this);
+    }
+    Mario.prototype.StartSmash = function () {
+        if (this.isSmashing) {
+            return;
+        }
+        this.isSmashing = true;
+        this.isMovingRightToLeft = true;
+        this.animations.play('hammer', 8, true);
+    };
+    Mario.prototype.update = function () {
+        if (!this.isSmashing) {
+            return;
+        }
+        if (this.isMovingRightToLeft) {
+            this.x += 3;
+        }
+        else {
+            this.x += -3;
+        }
+    };
+    Mario.prototype.ReachedEndOfPlatform = function () {
+        console.log('out of bounds');
+        this.scale.x *= -1;
+        if (this.isMovingRightToLeft) {
+            this.isMovingRightToLeft = false;
+            this.x += 3;
+        }
+        else {
+            this.isMovingRightToLeft = true;
+            this.x += -3;
+        }
+        var nextRowHeight = this.getNextRowHeight(this.y) - 50;
+        //this.y = this.getNextRowHeight(this.y) - 50;
+        console.log('nextRowHeight:' + nextRowHeight + 'current rowHeight:' + this.y);
+        console.log(this.platformHights);
+        if (nextRowHeight + 50 > this.y) {
+            this.resetMario();
+        }
+        this.y = nextRowHeight;
+    };
+    Mario.prototype.resetMario = function () {
+        if (!this.isMovingRightToLeft) {
+            this.scale.x *= -1;
+            this.isMovingRightToLeft = false;
+        }
+        this.isSmashing = false;
+        this.x = 50;
+        this.y = this.game.height - 80;
+    };
+    Mario.prototype.getNextRowHeight = function (currentHeight) {
+        for (var j = 0; j < this.platformHights.length; j++) {
+            if (currentHeight > this.platformHights[j]) {
+                return this.platformHights[j];
+            }
+        }
+        return this.platformHights[0];
+    };
+    return Mario;
+})(Phaser.Sprite);
+///<reference path="../../tools/typings/tsd.d.ts" />
+///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var Platform = (function (_super) {
     __extends(Platform, _super);
     function Platform(game) {
@@ -105,24 +184,56 @@ var WinnerCount = (function (_super) {
 })(Phaser.Text);
 ///<reference path="../../tools/typings/tsd.d.ts" />
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
+//gets random winners.  And Saves users that have already been drawn.
+var WinnerDraw = (function () {
+    function WinnerDraw(eventId) {
+        this.eventId = eventId;
+    }
+    WinnerDraw.prototype.PickWinners = function (numberToPick) {
+        var results;
+        if (numberToPick === 1) {
+            results = ['12345678901234567890123456789012345678901234567890'];
+            return results;
+        }
+        else {
+            results = ['Winner 1', 'Winner 2'];
+            return results;
+        }
+    };
+    return WinnerDraw;
+})();
+///<reference path="../../tools/typings/tsd.d.ts" />
+///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var WinnerPicker = (function () {
     function WinnerPicker(width) {
         this.game = new Phaser.Game(width, 600, Phaser.AUTO, 'stage', { preload: this.preload, create: this.create, update: this.update });
     }
     WinnerPicker.prototype.preload = function () {
         this.game.load.image('platform', 'src/img/platform.png');
-        this.game.load.spritesheet('kong', 'src/img//kong.png', 48, 34);
+        this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
+        this.game.load.image('barrel', 'src/img/barrel.png');
+        this.game.load.spritesheet('mario', 'src/img/mario.png', 34, 28);
     };
     WinnerPicker.prototype.create = function () {
         this.platform = new Platform(this.game);
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
-        this.winnerCount = new WinnerCount(this.game, 10);
+        this.winnerCount = new WinnerCount(this.game, this.platform.gameRowHeights.length);
         this.game.add.existing(this.winnerCount);
+        console.log('adding marrio : ');
+        console.log(this.game);
+        this.mario = new Mario(this.game, this.platform.gameRowHeights);
+        this.game.add.existing(this.mario);
+        this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     };
     WinnerPicker.prototype.update = function () {
         this.game.physics.arcade.collide(this.kong, this.platform);
+        this.game.physics.arcade.collide(this.mario, this.platform);
         this.winnerCount.CheckKeys();
+        this.mario.update();
+        if (this.spaceKey.justDown) {
+            this.mario.StartSmash();
+        }
     };
     return WinnerPicker;
 })();
