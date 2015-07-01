@@ -13,33 +13,42 @@ class WinnerPicker {
     winnerCount : WinnerCount;
     mario: Mario;
     spaceKey: Phaser.Key;
+    barrels: Phaser.Group;
+    winners: WinnerName;
 
     preload() {
         this.game.load.image('platform', 'src/img/platform.png');
         this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
         this.game.load.image('barrel', 'src/img/barrel.png');
         this.game.load.spritesheet('mario', 'src/img/mario.png', 34, 28);
+        this.game.load.bitmapFont('winnerFont', 'src/img/desyrel.png', 'src/img/desyrel.xml');
     }
 
     create() {
         this.platform = new Platform(this.game);
+        this.barrels = new Barrels(this.game, this.platform.gameRowHeights);
+        
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
 
         this.winnerCount = new WinnerCount(this.game, this.platform.gameRowHeights.length);
         this.game.add.existing(this.winnerCount);
 
-        console.log('adding marrio : ');
-        console.log(this.game);
         this.mario = new Mario(this.game, this.platform.gameRowHeights);
         this.game.add.existing(this.mario);
 
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        
+        this.winners = new WinnerName(576, this.game, "chaussures louboutin bleu chaussures louboutin bleu");
+        this.game.add.existing(this.winners)
+
+        //this.game.world.bringToTop(this.barrels);
     }
 
     update() {
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
+        this.game.physics.arcade.collide(this.mario, this.barrels, this.col, null, this);
         this.winnerCount.CheckKeys();
 
         this.mario.update();
@@ -48,6 +57,10 @@ class WinnerPicker {
             this.mario.StartSmash();
         }
 
+    }
+    
+    col(){
+        console.log('dd');
     }
 }
 

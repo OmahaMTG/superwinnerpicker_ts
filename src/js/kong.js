@@ -24,6 +24,27 @@ var Kong = (function (_super) {
 })(Phaser.Sprite);
 ///<reference path="../../tools/typings/tsd.d.ts" />
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
+var Barrels = (function (_super) {
+    __extends(Barrels, _super);
+    function Barrels(game, platformHeights, mario) {
+        var _this = this;
+        _super.call(this, game);
+        platformHeights.forEach(function (x) {
+            for (var column = 0; column < 25; column++) {
+                var barrel = _this.create(column * (10 * 2.5) + 100, x - 40, 'barrel');
+                game.physics.arcade.enable(barrel);
+                barrel.body.bounce.y = 0.1;
+                barrel.body.gravity.y = 100;
+                barrel.body.collideWorldBounds = true;
+                _this.game.physics.arcade.enableBody(barrel);
+                barrel.scale.setTo(2.5, 2.5);
+            }
+        });
+    }
+    return Barrels;
+})(Phaser.Group);
+///<reference path="../../tools/typings/tsd.d.ts" />
+///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var Mario = (function (_super) {
     __extends(Mario, _super);
     function Mario(game, platformHeights) {
@@ -204,6 +225,18 @@ var WinnerDraw = (function () {
 })();
 ///<reference path="../../tools/typings/tsd.d.ts" />
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
+var WinnerName = (function (_super) {
+    __extends(WinnerName, _super);
+    function WinnerName(platformHeight, game, winnerName) {
+        _super.call(this, game, game.width / 2, platformHeight - 40, 'winnerFont', winnerName, 25);
+        this.x = (game.width / 2) - this.width / 2;
+        console.log(this.z);
+        //this.visible = false;
+    }
+    return WinnerName;
+})(Phaser.BitmapText);
+///<reference path="../../tools/typings/tsd.d.ts" />
+///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var WinnerPicker = (function () {
     function WinnerPicker(width) {
         this.game = new Phaser.Game(width, 600, Phaser.AUTO, 'stage', { preload: this.preload, create: this.create, update: this.update });
@@ -213,27 +246,34 @@ var WinnerPicker = (function () {
         this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
         this.game.load.image('barrel', 'src/img/barrel.png');
         this.game.load.spritesheet('mario', 'src/img/mario.png', 34, 28);
+        this.game.load.bitmapFont('winnerFont', 'src/img/desyrel.png', 'src/img/desyrel.xml');
     };
     WinnerPicker.prototype.create = function () {
         this.platform = new Platform(this.game);
+        this.barrels = new Barrels(this.game, this.platform.gameRowHeights);
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
         this.winnerCount = new WinnerCount(this.game, this.platform.gameRowHeights.length);
         this.game.add.existing(this.winnerCount);
-        console.log('adding marrio : ');
-        console.log(this.game);
         this.mario = new Mario(this.game, this.platform.gameRowHeights);
         this.game.add.existing(this.mario);
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.winners = new WinnerName(576, this.game, "chaussures louboutin bleu chaussures louboutin bleu");
+        this.game.add.existing(this.winners);
+        //this.game.world.bringToTop(this.barrels);
     };
     WinnerPicker.prototype.update = function () {
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
+        this.game.physics.arcade.collide(this.mario, this.barrels, this.col, null, this);
         this.winnerCount.CheckKeys();
         this.mario.update();
         if (this.spaceKey.justDown) {
             this.mario.StartSmash();
         }
+    };
+    WinnerPicker.prototype.col = function () {
+        console.log('dd');
     };
     return WinnerPicker;
 })();
