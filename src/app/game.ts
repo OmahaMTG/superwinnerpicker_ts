@@ -26,7 +26,7 @@ class WinnerPicker {
 
     create() {
         this.platform = new Platform(this.game);
-        this.barrels = new Barrels(this.game, this.platform.gameRowHeights);
+        
         
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
@@ -36,19 +36,24 @@ class WinnerPicker {
 
         this.mario = new Mario(this.game, this.platform.gameRowHeights);
         this.game.add.existing(this.mario);
+        
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        this.game.physics.p2.setImpactEvents(true);
 
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         
         this.winners = new WinnerName(576, this.game, "chaussures louboutin bleu chaussures louboutin bleu");
         this.game.add.existing(this.winners)
 
+        this.barrels = new Barrels(this.game, this.platform.gameRowHeights, this.mario);
         //this.game.world.bringToTop(this.barrels);
     }
 
     update() {
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
-        this.game.physics.arcade.collide(this.mario, this.barrels, this.col, null, this);
+        this.game.physics.arcade.collide(this.barrels, this.platform);
+        this.game.physics.arcade.collide(this.mario, this.barrels, col, null, null);
         this.winnerCount.CheckKeys();
 
         this.mario.update();
@@ -59,10 +64,13 @@ class WinnerPicker {
 
     }
     
-    col(){
-        console.log('dd');
-    }
+
 }
+
+    function col(marrio: Phaser.Sprite, barrels: Phaser.Sprite ):void{
+        console.log(barrels);
+        barrels.destroy();
+    }
 
 window.onload = () => {
     var stageWidth = $('#stage').width();

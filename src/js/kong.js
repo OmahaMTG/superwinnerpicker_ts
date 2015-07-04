@@ -30,8 +30,8 @@ var Barrels = (function (_super) {
         var _this = this;
         _super.call(this, game);
         platformHeights.forEach(function (x) {
-            for (var column = 0; column < 25; column++) {
-                var barrel = _this.create(column * (10 * 2.5) + 100, x - 40, 'barrel');
+            for (var column = 0; column < 27; column++) {
+                var barrel = _this.create(column * (14 * 2.5) + 200, x - 40 - 25, 'barrel');
                 game.physics.arcade.enable(barrel);
                 barrel.body.bounce.y = 0.1;
                 barrel.body.gravity.y = 100;
@@ -41,6 +41,9 @@ var Barrels = (function (_super) {
             }
         });
     }
+    Barrels.prototype.col = function () {
+        console.log("dd");
+    };
     return Barrels;
 })(Phaser.Group);
 ///<reference path="../../tools/typings/tsd.d.ts" />
@@ -52,6 +55,7 @@ var Mario = (function (_super) {
         this.platformHights = platformHeights;
         this.scale.set(3, 3);
         this.game.physics.arcade.enableBody(this);
+        this.body.setSize(34, 28, -30, 0);
         this.game.physics.arcade.enable;
         this.arcadeBody = this.body;
         this.arcadeBody.gravity.y = 300;
@@ -69,31 +73,15 @@ var Mario = (function (_super) {
             return;
         }
         this.isSmashing = true;
-        this.isMovingRightToLeft = true;
         this.animations.play('hammer', 8, true);
     };
     Mario.prototype.update = function () {
         if (!this.isSmashing) {
             return;
         }
-        if (this.isMovingRightToLeft) {
-            this.x += 3;
-        }
-        else {
-            this.x += -3;
-        }
+        this.body.velocity.x = 250;
     };
     Mario.prototype.ReachedEndOfPlatform = function () {
-        console.log('out of bounds');
-        this.scale.x *= -1;
-        if (this.isMovingRightToLeft) {
-            this.isMovingRightToLeft = false;
-            this.x += 3;
-        }
-        else {
-            this.isMovingRightToLeft = true;
-            this.x += -3;
-        }
         var nextRowHeight = this.getNextRowHeight(this.y) - 50;
         //this.y = this.getNextRowHeight(this.y) - 50;
         console.log('nextRowHeight:' + nextRowHeight + 'current rowHeight:' + this.y);
@@ -101,13 +89,10 @@ var Mario = (function (_super) {
         if (nextRowHeight + 50 > this.y) {
             this.resetMario();
         }
+        this.x = 1;
         this.y = nextRowHeight;
     };
     Mario.prototype.resetMario = function () {
-        if (!this.isMovingRightToLeft) {
-            this.scale.x *= -1;
-            this.isMovingRightToLeft = false;
-        }
         this.isSmashing = false;
         this.x = 50;
         this.y = this.game.height - 80;
@@ -229,6 +214,7 @@ var WinnerName = (function (_super) {
     __extends(WinnerName, _super);
     function WinnerName(platformHeight, game, winnerName) {
         _super.call(this, game, game.width / 2, platformHeight - 40, 'winnerFont', winnerName, 25);
+        //this.visible = false;
         this.x = (game.width / 2) - this.width / 2;
         console.log(this.z);
         //this.visible = false;
@@ -250,33 +236,37 @@ var WinnerPicker = (function () {
     };
     WinnerPicker.prototype.create = function () {
         this.platform = new Platform(this.game);
-        this.barrels = new Barrels(this.game, this.platform.gameRowHeights);
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
         this.winnerCount = new WinnerCount(this.game, this.platform.gameRowHeights.length);
         this.game.add.existing(this.winnerCount);
         this.mario = new Mario(this.game, this.platform.gameRowHeights);
         this.game.add.existing(this.mario);
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        this.game.physics.p2.setImpactEvents(true);
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.winners = new WinnerName(576, this.game, "chaussures louboutin bleu chaussures louboutin bleu");
         this.game.add.existing(this.winners);
+        this.barrels = new Barrels(this.game, this.platform.gameRowHeights, this.mario);
         //this.game.world.bringToTop(this.barrels);
     };
     WinnerPicker.prototype.update = function () {
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
-        this.game.physics.arcade.collide(this.mario, this.barrels, this.col, null, this);
+        this.game.physics.arcade.collide(this.barrels, this.platform);
+        this.game.physics.arcade.collide(this.mario, this.barrels, col, null, null);
         this.winnerCount.CheckKeys();
         this.mario.update();
         if (this.spaceKey.justDown) {
             this.mario.StartSmash();
         }
     };
-    WinnerPicker.prototype.col = function () {
-        console.log('dd');
-    };
     return WinnerPicker;
 })();
+function col(marrio, barrels) {
+    console.log(barrels);
+    barrels.destroy();
+}
 window.onload = function () {
     var stageWidth = $('#stage').width();
     // var game = new SimpleGame(stageWidth, () => {
