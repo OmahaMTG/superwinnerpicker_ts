@@ -26,8 +26,7 @@ class WinnerPicker {
 
     create() {
         this.platform = new Platform(this.game);
-        
-        
+
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
 
@@ -36,20 +35,20 @@ class WinnerPicker {
 
         this.mario = new Mario(this.game, this.platform.gameRowHeights);
         this.game.add.existing(this.mario);
-        
+
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.setImpactEvents(true);
 
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        
-        this.winners = new WinnerName(576, this.game, "chaussures louboutin bleu chaussures louboutin bleu");
-        this.game.add.existing(this.winners)
+
+        this.winners = new WinnerName(576, this.game, 'chaussures louboutin bleu chaussures louboutin bleu');
+        this.game.add.existing(this.winners);
 
         this.barrels = new Barrels(this.game, this.platform.gameRowHeights, this.mario);
-        //this.game.world.bringToTop(this.barrels);
     }
 
     update() {
+        this.game.debug.spriteInfo(<Phaser.Sprite>this.mario, 32, 32);
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
         this.game.physics.arcade.collide(this.barrels, this.platform);
@@ -61,22 +60,15 @@ class WinnerPicker {
         if (this.spaceKey.justDown) {
             this.mario.StartSmash();
         }
-
     }
-    
-
 }
 
-    function col(marrio: Phaser.Sprite, barrels: Phaser.Sprite ):void{
-        console.log(barrels);
-        barrels.destroy();
-    }
+function col(marrio: Phaser.Sprite, barrels: Phaser.Sprite ):void {
+    console.log(barrels);
+    barrels.destroy();
+}
 
 window.onload = () => {
     var stageWidth = $('#stage').width();
-    // var game = new SimpleGame(stageWidth, () => {
-    //     alert('done'); 
-    //     console.log(game.platform)
-    // });
     var game = new WinnerPicker(stageWidth);
 };

@@ -5,16 +5,18 @@ class Mario extends Phaser.Sprite{
 	private arcadeBody: Phaser.Physics.Arcade.Body;
 	private isSmashing: boolean;
 
+
 	private platformHights: number[];
 
 	constructor(game: Phaser.Game, platformHeights: number[]) {
 		super(game, 50, game.height - 80, 'mario');
+		this.game = game;
 		this.platformHights = platformHeights;
 		this.scale.set(3, 3);
 		this.game.physics.arcade.enableBody(this);
-		
-		this.body.setSize(34, 28, -30, 0)
-		
+
+		this.body.setSize(34, 28, -30, 0);
+
 		this.game.physics.arcade.enable;
 
 		this.arcadeBody = <Phaser.Physics.Arcade.Body>this.body;
@@ -26,7 +28,7 @@ class Mario extends Phaser.Sprite{
 		this.animations.play('ready', 8 , true);
 
 		this.anchor.setTo(.5, .5);
-		
+
 	    this.scale.x *= -1;
 		this.isSmashing = false;
 		this.checkWorldBounds = true;
@@ -48,26 +50,27 @@ class Mario extends Phaser.Sprite{
 		if (!this.isSmashing) {
 			return;
 		}
-				this.body.velocity.x = 250;
-
+		this.body.velocity.x = 250;
 	}
 
 	private ReachedEndOfPlatform() {
 		var nextRowHeight = this.getNextRowHeight(this.y) - 50;
-		//this.y = this.getNextRowHeight(this.y) - 50;
-		console.log('nextRowHeight:' + nextRowHeight + 'current rowHeight:' + this.y);
-		console.log(this.platformHights);
-		if (nextRowHeight + 50 > this.y) {
+
+		if (nextRowHeight  > this.y) {
+			console.log('resetting');
 			this.resetMario();
+		}else {
+			this.x = 1;
+			this.y = nextRowHeight;
 		}
-		this.x = 1;
-		this.y = nextRowHeight;
 	}
 
 	private resetMario() {
-			this.isSmashing = false;
-			this.x = 50;
 			this.y = this.game.height - 80;
+			this.x = 50;
+			this.isSmashing = false;
+			this.animations.play('ready', 8 , true);
+			this.body.velocity.x = 0;
 	}
 
 	private getNextRowHeight(currentHeight) {

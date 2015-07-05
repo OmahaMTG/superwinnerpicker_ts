@@ -41,9 +41,6 @@ var Barrels = (function (_super) {
             }
         });
     }
-    Barrels.prototype.col = function () {
-        console.log("dd");
-    };
     return Barrels;
 })(Phaser.Group);
 ///<reference path="../../tools/typings/tsd.d.ts" />
@@ -52,6 +49,7 @@ var Mario = (function (_super) {
     __extends(Mario, _super);
     function Mario(game, platformHeights) {
         _super.call(this, game, 50, game.height - 80, 'mario');
+        this.game = game;
         this.platformHights = platformHeights;
         this.scale.set(3, 3);
         this.game.physics.arcade.enableBody(this);
@@ -83,19 +81,21 @@ var Mario = (function (_super) {
     };
     Mario.prototype.ReachedEndOfPlatform = function () {
         var nextRowHeight = this.getNextRowHeight(this.y) - 50;
-        //this.y = this.getNextRowHeight(this.y) - 50;
-        console.log('nextRowHeight:' + nextRowHeight + 'current rowHeight:' + this.y);
-        console.log(this.platformHights);
-        if (nextRowHeight + 50 > this.y) {
+        if (nextRowHeight > this.y) {
+            console.log('resetting');
             this.resetMario();
         }
-        this.x = 1;
-        this.y = nextRowHeight;
+        else {
+            this.x = 1;
+            this.y = nextRowHeight;
+        }
     };
     Mario.prototype.resetMario = function () {
-        this.isSmashing = false;
-        this.x = 50;
         this.y = this.game.height - 80;
+        this.x = 50;
+        this.isSmashing = false;
+        this.animations.play('ready', 8, true);
+        this.body.velocity.x = 0;
     };
     Mario.prototype.getNextRowHeight = function (currentHeight) {
         for (var j = 0; j < this.platformHights.length; j++) {
@@ -214,10 +214,8 @@ var WinnerName = (function (_super) {
     __extends(WinnerName, _super);
     function WinnerName(platformHeight, game, winnerName) {
         _super.call(this, game, game.width / 2, platformHeight - 40, 'winnerFont', winnerName, 25);
-        //this.visible = false;
         this.x = (game.width / 2) - this.width / 2;
         console.log(this.z);
-        //this.visible = false;
     }
     return WinnerName;
 })(Phaser.BitmapText);
@@ -245,12 +243,12 @@ var WinnerPicker = (function () {
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.setImpactEvents(true);
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.winners = new WinnerName(576, this.game, "chaussures louboutin bleu chaussures louboutin bleu");
+        this.winners = new WinnerName(576, this.game, 'chaussures louboutin bleu chaussures louboutin bleu');
         this.game.add.existing(this.winners);
         this.barrels = new Barrels(this.game, this.platform.gameRowHeights, this.mario);
-        //this.game.world.bringToTop(this.barrels);
     };
     WinnerPicker.prototype.update = function () {
+        this.game.debug.spriteInfo(this.mario, 32, 32);
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
         this.game.physics.arcade.collide(this.barrels, this.platform);
@@ -269,10 +267,6 @@ function col(marrio, barrels) {
 }
 window.onload = function () {
     var stageWidth = $('#stage').width();
-    // var game = new SimpleGame(stageWidth, () => {
-    //     alert('done'); 
-    //     console.log(game.platform)
-    // });
     var game = new WinnerPicker(stageWidth);
 };
 
