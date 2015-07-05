@@ -6,7 +6,7 @@ class WinnerCount extends Phaser.Text{
 	private maxWinners: number;
 	private upKey: Phaser.Key;
 	private downKey: Phaser.Key;
-	private numberOfWinnersToGet :number;
+	public numberOfWinnersToGet :number;
 	private helpText: string;
 
 	constructor(game: Phaser.Game, maxWinners: number) {

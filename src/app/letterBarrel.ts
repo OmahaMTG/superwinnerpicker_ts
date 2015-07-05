@@ -10,7 +10,7 @@ class Barrels extends Phaser.Group{
 
 		platformHeights.forEach(x => {
 			for (var column = 0; column < 27; column++) {
-                var barrel = this.create(column * (14 * 2.5) + 200,  x - 40  - 25, 'barrel');
+                var barrel = this.create(column * (14 * 2.5) + 200,  x - 40 , 'barrel');
 				game.physics.arcade.enable(barrel);
 				barrel.body.bounce.y = 0.1;
 			    barrel.body.gravity.y = 100;

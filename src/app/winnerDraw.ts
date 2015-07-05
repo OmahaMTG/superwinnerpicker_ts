@@ -9,14 +9,29 @@ class WinnerDraw {
 	}
 
 	public PickWinners(numberToPick: number) {
-		var results : string[];
-		if (numberToPick === 1) {
-			results = ['12345678901234567890123456789012345678901234567890'];
-			return results;
-		}else {
-			results = ['Winner 1', 'Winner 2'];
-			return results;
-		}
+		var rsvpUsers =  ['chaussures louboutin bleu chaussures louboutin bleu'
+							, 'hermes taschen billig hermes taschen billig'
+							, 'abercrombie billig abercrombie billig'
+							, 'Krishna Chaitanya Bezwada'
+							, 'Sivakumar Rathinavelumani'
+							, 'Christina Schneiderheinze'
+							, 'Vallinayagam Alagianambi'
+							, 'Shivakrishna Shagabandi'
+							, 'Raghavendra Immadisetty'
+							, 'Karen Reinhardt-Buckley'
+							, 'Patricia (Patty) ODell'							
+							];
+		rsvpUsers = this.shuffle(rsvpUsers)
+		
+		console.log(numberToPick);
+		return rsvpUsers.slice(1, 1 + numberToPick);
+		
+		
+	}
+	
+	private shuffle(o){
+	    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	    return o;
 	}
 
 }

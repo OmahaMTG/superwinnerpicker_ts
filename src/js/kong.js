@@ -31,7 +31,7 @@ var Barrels = (function (_super) {
         _super.call(this, game);
         platformHeights.forEach(function (x) {
             for (var column = 0; column < 27; column++) {
-                var barrel = _this.create(column * (14 * 2.5) + 200, x - 40 - 25, 'barrel');
+                var barrel = _this.create(column * (14 * 2.5) + 200, x - 40, 'barrel');
                 game.physics.arcade.enable(barrel);
                 barrel.body.bounce.y = 0.1;
                 barrel.body.gravity.y = 100;
@@ -47,10 +47,9 @@ var Barrels = (function (_super) {
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var Mario = (function (_super) {
     __extends(Mario, _super);
-    function Mario(game, platformHeights) {
+    function Mario(game) {
         _super.call(this, game, 50, game.height - 80, 'mario');
         this.game = game;
-        this.platformHights = platformHeights;
         this.scale.set(3, 3);
         this.game.physics.arcade.enableBody(this);
         this.body.setSize(34, 28, -30, 0);
@@ -66,7 +65,8 @@ var Mario = (function (_super) {
         this.checkWorldBounds = true;
         this.events.onOutOfBounds.add(this.ReachedEndOfPlatform, this);
     }
-    Mario.prototype.StartSmash = function () {
+    Mario.prototype.StartSmash = function (platformHeights) {
+        this.platformHights = platformHeights;
         if (this.isSmashing) {
             return;
         }
@@ -81,7 +81,8 @@ var Mario = (function (_super) {
     };
     Mario.prototype.ReachedEndOfPlatform = function () {
         var nextRowHeight = this.getNextRowHeight(this.y) - 50;
-        if (nextRowHeight > this.y) {
+        console.log('Next Row Height: ' + nextRowHeight + ' this.y:' + this.y);
+        if (nextRowHeight + 8 >= this.y) {
             console.log('resetting');
             this.resetMario();
         }
@@ -196,15 +197,15 @@ var WinnerDraw = (function () {
         this.eventId = eventId;
     }
     WinnerDraw.prototype.PickWinners = function (numberToPick) {
-        var results;
-        if (numberToPick === 1) {
-            results = ['12345678901234567890123456789012345678901234567890'];
-            return results;
-        }
-        else {
-            results = ['Winner 1', 'Winner 2'];
-            return results;
-        }
+        var rsvpUsers = ['chaussures louboutin bleu chaussures louboutin bleu', 'hermes taschen billig hermes taschen billig', 'abercrombie billig abercrombie billig', 'Krishna Chaitanya Bezwada', 'Sivakumar Rathinavelumani', 'Christina Schneiderheinze', 'Vallinayagam Alagianambi', 'Shivakrishna Shagabandi', 'Raghavendra Immadisetty', 'Karen Reinhardt-Buckley', 'Patricia (Patty) ODell'];
+        rsvpUsers = this.shuffle(rsvpUsers);
+        console.log(numberToPick);
+        return rsvpUsers.slice(1, 1 + numberToPick);
+    };
+    WinnerDraw.prototype.shuffle = function (o) {
+        for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x)
+            ;
+        return o;
     };
     return WinnerDraw;
 })();
@@ -216,6 +217,7 @@ var WinnerName = (function (_super) {
         _super.call(this, game, game.width / 2, platformHeight - 40, 'winnerFont', winnerName, 25);
         this.x = (game.width / 2) - this.width / 2;
         console.log(this.z);
+        game.add.existing(this);
     }
     return WinnerName;
 })(Phaser.BitmapText);
@@ -223,6 +225,8 @@ var WinnerName = (function (_super) {
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var WinnerPicker = (function () {
     function WinnerPicker(width) {
+        this.winners = [];
+        this.isRunning = false;
         this.game = new Phaser.Game(width, 600, Phaser.AUTO, 'stage', { preload: this.preload, create: this.create, update: this.update });
     }
     WinnerPicker.prototype.preload = function () {
@@ -243,12 +247,8 @@ var WinnerPicker = (function () {
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.setImpactEvents(true);
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.winners = new WinnerName(576, this.game, 'chaussures louboutin bleu chaussures louboutin bleu');
-        this.game.add.existing(this.winners);
-        this.barrels = new Barrels(this.game, this.platform.gameRowHeights, this.mario);
     };
     WinnerPicker.prototype.update = function () {
-        this.game.debug.spriteInfo(this.mario, 32, 32);
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
         this.game.physics.arcade.collide(this.barrels, this.platform);
@@ -256,13 +256,25 @@ var WinnerPicker = (function () {
         this.winnerCount.CheckKeys();
         this.mario.update();
         if (this.spaceKey.justDown) {
-            this.mario.StartSmash();
+            if (this.isRunning) {
+                return;
+            }
+            this.isRunning = true;
+            var wd = new WinnerDraw(212);
+            var drawnWinners = wd.PickWinners(this.winnerCount.numberOfWinnersToGet);
+            this.winners = [];
+            var heightsForBarrels = [];
+            for (var i = 0; i < drawnWinners.length; i++) {
+                this.winners.push(new WinnerName(this.platform.gameRowHeights[i], this.game, drawnWinners[i]));
+                heightsForBarrels.push(this.platform.gameRowHeights[i]);
+            }
+            this.barrels = new Barrels(this.game, heightsForBarrels, this.mario);
+            this.mario.StartSmash(heightsForBarrels);
         }
     };
     return WinnerPicker;
 })();
 function col(marrio, barrels) {
-    console.log(barrels);
     barrels.destroy();
 }
 window.onload = function () {

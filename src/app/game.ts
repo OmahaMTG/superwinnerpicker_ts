@@ -14,7 +14,8 @@ class WinnerPicker {
     mario: Mario;
     spaceKey: Phaser.Key;
     barrels: Phaser.Group;
-    winners: WinnerName;
+    winners: WinnerName[] = [];
+    isRunning: boolean = false;
 
     preload() {
         this.game.load.image('platform', 'src/img/platform.png');
@@ -41,14 +42,10 @@ class WinnerPicker {
 
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-        this.winners = new WinnerName(576, this.game, 'chaussures louboutin bleu chaussures louboutin bleu');
-        this.game.add.existing(this.winners);
 
-        this.barrels = new Barrels(this.game, this.platform.gameRowHeights, this.mario);
     }
 
     update() {
-        this.game.debug.spriteInfo(<Phaser.Sprite>this.mario, 32, 32);
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
         this.game.physics.arcade.collide(this.barrels, this.platform);
@@ -58,13 +55,32 @@ class WinnerPicker {
         this.mario.update();
 
         if (this.spaceKey.justDown) {
-            this.mario.StartSmash();
+            if (this.isRunning) {
+                return;
+            }
+                
+            this.isRunning = true;
+            
+            var wd = new WinnerDraw(212);
+            var drawnWinners = wd.PickWinners(this.winnerCount.numberOfWinnersToGet);
+            this.winners = [];
+            var heightsForBarrels = [];
+            for (var i = 0; i < drawnWinners.length; i++) {
+                this.winners.push(new WinnerName(this.platform.gameRowHeights[i], this.game, drawnWinners[i]));
+                heightsForBarrels.push(this.platform.gameRowHeights[i]);
+            }
+            
+            
+            this.barrels = new Barrels(this.game, heightsForBarrels, this.mario);
+            
+            this.mario.StartSmash(heightsForBarrels);
+            
+ 
         }
     }
 }
 
 function col(marrio: Phaser.Sprite, barrels: Phaser.Sprite ):void {
-    console.log(barrels);
     barrels.destroy();
 }
 

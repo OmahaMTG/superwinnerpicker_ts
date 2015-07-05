@@ -7,5 +7,6 @@ class WinnerName  extends Phaser.BitmapText {
 
 	this.x = (game.width / 2) - this.width / 2;
 	console.log(this.z);
+	game.add.existing(this);
 	}
 }
