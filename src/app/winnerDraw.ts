@@ -10,16 +10,20 @@ class WinnerDraw {
 
 	public PickWinners(numberToPick: number) {
 		var rsvpUsers =  ['chaussures louboutin bleu chaussures louboutin bleu'
-							, 'hermes taschen billig hermes taschen billig'
-							, 'abercrombie billig abercrombie billig'
-							, 'Krishna Chaitanya Bezwada'
-							, 'Sivakumar Rathinavelumani'
-							, 'Christina Schneiderheinze'
-							, 'Vallinayagam Alagianambi'
-							, 'Shivakrishna Shagabandi'
-							, 'Raghavendra Immadisetty'
-							, 'Karen Reinhardt-Buckley'
-							, 'Patricia (Patty) ODell'							
+							, 'Danyelle Bui'
+							, 'Santos Breaux'
+							, 'Maile Mongold'
+							, 'Josephine Organ'
+							, 'Cathrine Monaghan'
+							, 'Ivelisse Ramsden'
+							, 'Lyndsey Wunder'
+							, 'Rodrigo Coger'
+							, 'Quincy Donley'
+							, 'Broderick Nielsen'
+							, 'Shyla Mcglamery'
+							, 'Katherine Williamson'
+							, 'Ines Gerhold'
+							, 'Darion DuBuque'					
 							];
 		rsvpUsers = this.shuffle(rsvpUsers)
 		

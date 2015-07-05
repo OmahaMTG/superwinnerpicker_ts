@@ -4,7 +4,7 @@
 class Mario extends Phaser.Sprite{
 	private arcadeBody: Phaser.Physics.Arcade.Body;
 	private isSmashing: boolean;
-
+	public  reachedEnd: {(): void;};
 
 	private platformHights: number[];
 
@@ -33,9 +33,12 @@ class Mario extends Phaser.Sprite{
 		this.isSmashing = false;
 		this.checkWorldBounds = true;
 		this.events.onOutOfBounds.add(this.ReachedEndOfPlatform, this);
+		
+	
 	}
 
-	public StartSmash(platformHeights: number[]) {
+	public StartSmash(platformHeights: number[], reachedEnd: {(): void}) {
+		this.reachedEnd = reachedEnd;
 		this.platformHights = platformHeights;
 		if (this.isSmashing) {
 			return;
@@ -69,6 +72,7 @@ class Mario extends Phaser.Sprite{
 			this.y = this.game.height - 80;
 			this.x = 50;
 			this.isSmashing = false;
+			this.reachedEnd();
 			this.animations.play('ready', 8 , true);
 			this.body.velocity.x = 0;
 	}

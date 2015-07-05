@@ -65,7 +65,8 @@ var Mario = (function (_super) {
         this.checkWorldBounds = true;
         this.events.onOutOfBounds.add(this.ReachedEndOfPlatform, this);
     }
-    Mario.prototype.StartSmash = function (platformHeights) {
+    Mario.prototype.StartSmash = function (platformHeights, reachedEnd) {
+        this.reachedEnd = reachedEnd;
         this.platformHights = platformHeights;
         if (this.isSmashing) {
             return;
@@ -95,6 +96,7 @@ var Mario = (function (_super) {
         this.y = this.game.height - 80;
         this.x = 50;
         this.isSmashing = false;
+        this.reachedEnd();
         this.animations.play('ready', 8, true);
         this.body.velocity.x = 0;
     };
@@ -197,7 +199,7 @@ var WinnerDraw = (function () {
         this.eventId = eventId;
     }
     WinnerDraw.prototype.PickWinners = function (numberToPick) {
-        var rsvpUsers = ['chaussures louboutin bleu chaussures louboutin bleu', 'hermes taschen billig hermes taschen billig', 'abercrombie billig abercrombie billig', 'Krishna Chaitanya Bezwada', 'Sivakumar Rathinavelumani', 'Christina Schneiderheinze', 'Vallinayagam Alagianambi', 'Shivakrishna Shagabandi', 'Raghavendra Immadisetty', 'Karen Reinhardt-Buckley', 'Patricia (Patty) ODell'];
+        var rsvpUsers = ['chaussures louboutin bleu chaussures louboutin bleu', 'Danyelle Bui', 'Santos Breaux', 'Maile Mongold', 'Josephine Organ', 'Cathrine Monaghan', 'Ivelisse Ramsden', 'Lyndsey Wunder', 'Rodrigo Coger', 'Quincy Donley', 'Broderick Nielsen', 'Shyla Mcglamery', 'Katherine Williamson', 'Ines Gerhold', 'Darion DuBuque'];
         rsvpUsers = this.shuffle(rsvpUsers);
         console.log(numberToPick);
         return rsvpUsers.slice(1, 1 + numberToPick);
@@ -242,13 +244,15 @@ var WinnerPicker = (function () {
         this.game.add.existing(this.kong);
         this.winnerCount = new WinnerCount(this.game, this.platform.gameRowHeights.length);
         this.game.add.existing(this.winnerCount);
-        this.mario = new Mario(this.game, this.platform.gameRowHeights);
+        this.mario = new Mario(this.game);
         this.game.add.existing(this.mario);
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.setImpactEvents(true);
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.winners = [];
     };
     WinnerPicker.prototype.update = function () {
+        var _this = this;
         this.game.physics.arcade.collide(this.kong, this.platform);
         this.game.physics.arcade.collide(this.mario, this.platform);
         this.game.physics.arcade.collide(this.barrels, this.platform);
@@ -259,17 +263,22 @@ var WinnerPicker = (function () {
             if (this.isRunning) {
                 return;
             }
+            for (var i = 0; i < this.winners.length; i++) {
+                this.game.world.remove(this.winners[i]);
+            }
+            this.winners = [];
             this.isRunning = true;
             var wd = new WinnerDraw(212);
             var drawnWinners = wd.PickWinners(this.winnerCount.numberOfWinnersToGet);
-            this.winners = [];
             var heightsForBarrels = [];
             for (var i = 0; i < drawnWinners.length; i++) {
                 this.winners.push(new WinnerName(this.platform.gameRowHeights[i], this.game, drawnWinners[i]));
                 heightsForBarrels.push(this.platform.gameRowHeights[i]);
             }
             this.barrels = new Barrels(this.game, heightsForBarrels, this.mario);
-            this.mario.StartSmash(heightsForBarrels);
+            this.mario.StartSmash(heightsForBarrels, function () {
+                _this.isRunning = false;
+            });
         }
     };
     return WinnerPicker;

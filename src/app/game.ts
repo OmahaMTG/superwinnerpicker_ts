@@ -17,6 +17,7 @@ class WinnerPicker {
     winners: WinnerName[] = [];
     isRunning: boolean = false;
 
+
     preload() {
         this.game.load.image('platform', 'src/img/platform.png');
         this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
@@ -34,14 +35,14 @@ class WinnerPicker {
         this.winnerCount = new WinnerCount(this.game, this.platform.gameRowHeights.length);
         this.game.add.existing(this.winnerCount);
 
-        this.mario = new Mario(this.game, this.platform.gameRowHeights);
+        this.mario = new Mario(this.game);
         this.game.add.existing(this.mario);
 
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         this.game.physics.p2.setImpactEvents(true);
 
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
+        this.winners = [];
 
     }
 
@@ -58,12 +59,18 @@ class WinnerPicker {
             if (this.isRunning) {
                 return;
             }
+            
+            for (var i = 0; i < this.winners.length; i++) {
+                this.game.world.remove(this.winners[i]);
+            }
+            this.winners = [];
                 
             this.isRunning = true;
             
             var wd = new WinnerDraw(212);
             var drawnWinners = wd.PickWinners(this.winnerCount.numberOfWinnersToGet);
-            this.winners = [];
+            
+            
             var heightsForBarrels = [];
             for (var i = 0; i < drawnWinners.length; i++) {
                 this.winners.push(new WinnerName(this.platform.gameRowHeights[i], this.game, drawnWinners[i]));
@@ -73,7 +80,10 @@ class WinnerPicker {
             
             this.barrels = new Barrels(this.game, heightsForBarrels, this.mario);
             
-            this.mario.StartSmash(heightsForBarrels);
+            this.mario.StartSmash(heightsForBarrels, () => {
+                
+                this.isRunning = false;
+            });
             
  
         }
