@@ -26,11 +26,13 @@ var Kong = (function (_super) {
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
 var Barrels = (function (_super) {
     __extends(Barrels, _super);
-    function Barrels(game, platformHeights, mario) {
+    function Barrels(game, platformHeights) {
         var _this = this;
         _super.call(this, game);
+        this.game = game;
         platformHeights.forEach(function (x) {
-            for (var column = 0; column < 27; column++) {
+            console.log(_this.calculateNumberOfBarrels());
+            for (var column = 0; column < _this.calculateNumberOfBarrels(); column++) {
                 var barrel = _this.create(column * (14 * 2.5) + 200, x - 40, 'barrel');
                 game.physics.arcade.enable(barrel);
                 barrel.body.bounce.y = 0.1;
@@ -41,6 +43,10 @@ var Barrels = (function (_super) {
             }
         });
     }
+    Barrels.prototype.calculateNumberOfBarrels = function () {
+        console.log(this.game.width.toString() + " - 400(14*2.5)");
+        return (this.game.width - 400) / (14 * 2.5);
+    };
     return Barrels;
 })(Phaser.Group);
 ///<reference path="../../tools/typings/tsd.d.ts" />
@@ -196,13 +202,22 @@ var WinnerCount = (function (_super) {
 //gets random winners.  And Saves users that have already been drawn.
 var WinnerDraw = (function () {
     function WinnerDraw(eventId) {
+        var _this = this;
         this.eventId = eventId;
+        this.ajaxSuccess = function (data) {
+            _this.rsvpUsers = _this.shuffle(data);
+        };
+        $.ajax({
+            url: "http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=212",
+            dataType: 'jsonp',
+            async: false,
+            success: this.ajaxSuccess
+        });
     }
     WinnerDraw.prototype.PickWinners = function (numberToPick) {
-        var rsvpUsers = ['chaussures louboutin bleu chaussures louboutin bleu', 'Danyelle Bui', 'Santos Breaux', 'Maile Mongold', 'Josephine Organ', 'Cathrine Monaghan', 'Ivelisse Ramsden', 'Lyndsey Wunder', 'Rodrigo Coger', 'Quincy Donley', 'Broderick Nielsen', 'Shyla Mcglamery', 'Katherine Williamson', 'Ines Gerhold', 'Darion DuBuque'];
-        rsvpUsers = this.shuffle(rsvpUsers);
-        console.log(numberToPick);
-        return rsvpUsers.slice(1, 1 + numberToPick);
+        var results = this.rsvpUsers.slice(0, numberToPick);
+        this.rsvpUsers.splice(0, numberToPick);
+        return results;
     };
     WinnerDraw.prototype.shuffle = function (o) {
         for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x)
@@ -216,7 +231,7 @@ var WinnerDraw = (function () {
 var WinnerName = (function (_super) {
     __extends(WinnerName, _super);
     function WinnerName(platformHeight, game, winnerName) {
-        _super.call(this, game, game.width / 2, platformHeight - 40, 'winnerFont', winnerName, 25);
+        _super.call(this, game, game.width / 2, platformHeight - 45, 'winnerFont', winnerName, 40);
         this.x = (game.width / 2) - this.width / 2;
         console.log(this.z);
         game.add.existing(this);
@@ -236,9 +251,10 @@ var WinnerPicker = (function () {
         this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
         this.game.load.image('barrel', 'src/img/barrel.png');
         this.game.load.spritesheet('mario', 'src/img/mario.png', 34, 28);
-        this.game.load.bitmapFont('winnerFont', 'src/img/desyrel.png', 'src/img/desyrel.xml');
+        this.game.load.bitmapFont('winnerFont', 'src/img/font/font.png', 'src/img/font/font.fnt');
     };
     WinnerPicker.prototype.create = function () {
+        this.winnerDraw = new WinnerDraw(212);
         this.platform = new Platform(this.game);
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
         this.game.add.existing(this.kong);
@@ -268,14 +284,13 @@ var WinnerPicker = (function () {
             }
             this.winners = [];
             this.isRunning = true;
-            var wd = new WinnerDraw(212);
-            var drawnWinners = wd.PickWinners(this.winnerCount.numberOfWinnersToGet);
+            var drawnWinners = this.winnerDraw.PickWinners(this.winnerCount.numberOfWinnersToGet);
             var heightsForBarrels = [];
             for (var i = 0; i < drawnWinners.length; i++) {
                 this.winners.push(new WinnerName(this.platform.gameRowHeights[i], this.game, drawnWinners[i]));
                 heightsForBarrels.push(this.platform.gameRowHeights[i]);
             }
-            this.barrels = new Barrels(this.game, heightsForBarrels, this.mario);
+            this.barrels = new Barrels(this.game, heightsForBarrels);
             this.mario.StartSmash(heightsForBarrels, function () {
                 _this.isRunning = false;
             });

@@ -3,13 +3,13 @@
 
 class Barrels extends Phaser.Group{
 
-	mario: Mario;
-
-    constructor(game: Phaser.Game, platformHeights: number[], mario: Mario) {
+	game :Phaser.Game;
+    constructor(game: Phaser.Game, platformHeights: number[]) {
     	super(game);
-
+		this.game = game;
 		platformHeights.forEach(x => {
-			for (var column = 0; column < 27; column++) {
+			console.log(this.calculateNumberOfBarrels());
+			for (var column = 0; column < this.calculateNumberOfBarrels() ; column++) {
                 var barrel = this.create(column * (14 * 2.5) + 200,  x - 40 , 'barrel');
 				game.physics.arcade.enable(barrel);
 				barrel.body.bounce.y = 0.1;
@@ -20,4 +20,9 @@ class Barrels extends Phaser.Group{
             }
 		});
 	}
+	
+		private calculateNumberOfBarrels() :number {
+			console.log(this.game.width.toString() + " - 400(14*2.5)")
+			return (this.game.width - 400)/(14 * 2.5)
+		} 
 }

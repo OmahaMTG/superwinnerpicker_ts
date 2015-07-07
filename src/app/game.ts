@@ -16,6 +16,7 @@ class WinnerPicker {
     barrels: Phaser.Group;
     winners: WinnerName[] = [];
     isRunning: boolean = false;
+    winnerDraw: WinnerDraw;
 
 
     preload() {
@@ -23,10 +24,11 @@ class WinnerPicker {
         this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
         this.game.load.image('barrel', 'src/img/barrel.png');
         this.game.load.spritesheet('mario', 'src/img/mario.png', 34, 28);
-        this.game.load.bitmapFont('winnerFont', 'src/img/desyrel.png', 'src/img/desyrel.xml');
+        this.game.load.bitmapFont('winnerFont', 'src/img/font/font.png', 'src/img/font/font.fnt');
     }
 
     create() {
+        this.winnerDraw = new WinnerDraw(212);
         this.platform = new Platform(this.game);
 
         this.kong = new Kong(this.game, this.platform.kongRowHeight);
@@ -43,6 +45,7 @@ class WinnerPicker {
 
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.winners = [];
+        
 
     }
 
@@ -66,9 +69,8 @@ class WinnerPicker {
             this.winners = [];
                 
             this.isRunning = true;
-            
-            var wd = new WinnerDraw(212);
-            var drawnWinners = wd.PickWinners(this.winnerCount.numberOfWinnersToGet);
+
+            var drawnWinners = this.winnerDraw.PickWinners(this.winnerCount.numberOfWinnersToGet);
             
             
             var heightsForBarrels = [];
@@ -78,7 +80,7 @@ class WinnerPicker {
             }
             
             
-            this.barrels = new Barrels(this.game, heightsForBarrels, this.mario);
+            this.barrels = new Barrels(this.game, heightsForBarrels);
             
             this.mario.StartSmash(heightsForBarrels, () => {
                 
