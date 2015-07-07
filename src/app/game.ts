@@ -24,7 +24,7 @@ class WinnerPicker {
         this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
         this.game.load.image('barrel', 'src/img/barrel.png');
         this.game.load.spritesheet('mario', 'src/img/mario.png', 34, 28);
-        this.game.load.bitmapFont('winnerFont', 'src/img/font/font.png', 'src/img/font/font.fnt');
+        this.game.load.bitmapFont('winnerFont', 'src/img/font.png', 'src/img/font.fnt');
     }
 
     create() {
