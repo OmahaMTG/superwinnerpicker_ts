@@ -44,7 +44,6 @@ var Barrels = (function (_super) {
         });
     }
     Barrels.prototype.calculateNumberOfBarrels = function () {
-        console.log(this.game.width.toString() + " - 400(14*2.5)");
         return (this.game.width - 400) / (14 * 2.5);
     };
     return Barrels;
@@ -208,7 +207,7 @@ var WinnerDraw = (function () {
             _this.rsvpUsers = _this.shuffle(data);
         };
         $.ajax({
-            url: "http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=212",
+            url: 'http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=212',
             dataType: 'jsonp',
             async: false,
             success: this.ajaxSuccess
@@ -220,8 +219,9 @@ var WinnerDraw = (function () {
         return results;
     };
     WinnerDraw.prototype.shuffle = function (o) {
-        for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x)
-            ;
+        for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x) {
+        }
+        ;
         return o;
     };
     return WinnerDraw;
@@ -251,7 +251,7 @@ var WinnerPicker = (function () {
         this.game.load.spritesheet('kong', 'src/img/kong.png', 48, 34);
         this.game.load.image('barrel', 'src/img/barrel.png');
         this.game.load.spritesheet('mario', 'src/img/mario.png', 34, 28);
-        this.game.load.bitmapFont('winnerFont', 'src/img/font/font.png', 'src/img/font/font.fnt');
+        this.game.load.bitmapFont('winnerFont', 'src/img/font.png', 'src/img/font.fnt');
     };
     WinnerPicker.prototype.create = function () {
         this.winnerDraw = new WinnerDraw(212);

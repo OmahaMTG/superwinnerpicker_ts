@@ -45,8 +45,6 @@ class WinnerPicker {
 
         this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.winners = [];
-        
-
     }
 
     update() {
@@ -62,32 +60,28 @@ class WinnerPicker {
             if (this.isRunning) {
                 return;
             }
-            
+
             for (var i = 0; i < this.winners.length; i++) {
                 this.game.world.remove(this.winners[i]);
             }
             this.winners = [];
-                
-            this.isRunning = true;
 
+            this.isRunning = true;
             var drawnWinners = this.winnerDraw.PickWinners(this.winnerCount.numberOfWinnersToGet);
-            
-            
+
             var heightsForBarrels = [];
             for (var i = 0; i < drawnWinners.length; i++) {
                 this.winners.push(new WinnerName(this.platform.gameRowHeights[i], this.game, drawnWinners[i]));
                 heightsForBarrels.push(this.platform.gameRowHeights[i]);
             }
-            
-            
+
             this.barrels = new Barrels(this.game, heightsForBarrels);
-            
+
             this.mario.StartSmash(heightsForBarrels, () => {
-                
+
                 this.isRunning = false;
             });
-            
- 
+
         }
     }
 }

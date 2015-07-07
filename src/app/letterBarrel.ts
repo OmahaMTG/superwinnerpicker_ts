@@ -20,9 +20,8 @@ class Barrels extends Phaser.Group{
             }
 		});
 	}
-	
-		private calculateNumberOfBarrels() :number {
-			console.log(this.game.width.toString() + " - 400(14*2.5)")
-			return (this.game.width - 400)/(14 * 2.5)
-		} 
+
+	private calculateNumberOfBarrels() :number {
+		return (this.game.width - 400) / (14 * 2.5);
+	}
 }
