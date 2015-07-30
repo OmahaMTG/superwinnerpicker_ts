@@ -8,6 +8,13 @@ class WinnerDraw {
 
 	private ajaxSuccess: (any) => void;
 
+	getParameterByName(name) {
+	    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+	    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
+	    results = regex.exec(location.search);
+	    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+	}
+
 	constructor(eventId: number) {
 		this.eventId = eventId;
 
@@ -15,8 +22,10 @@ class WinnerDraw {
 			this.rsvpUsers = this.shuffle(data);
 		};
 
+		var eventID = this.getParameterByName('eventid');
+
 		$.ajax({
-			url: 'http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=212',
+			url: 'http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=' + eventID,
 			dataType : 'jsonp',
 			async: false,
 			success:  this.ajaxSuccess

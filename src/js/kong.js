@@ -1,6 +1,6 @@
 ///<reference path="../../tools/typings/tsd.d.ts" />
 ///<reference path="../../tools/typings/typescriptApp.d.ts" />
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -206,13 +206,19 @@ var WinnerDraw = (function () {
         this.ajaxSuccess = function (data) {
             _this.rsvpUsers = _this.shuffle(data);
         };
+        var eventID = this.getParameterByName('eventid');
         $.ajax({
-            url: 'http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=212',
+            url: 'http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=' + eventID,
             dataType: 'jsonp',
             async: false,
             success: this.ajaxSuccess
         });
     }
+    WinnerDraw.prototype.getParameterByName = function (name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'), results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    };
     WinnerDraw.prototype.PickWinners = function (numberToPick) {
         var results = this.rsvpUsers.slice(0, numberToPick);
         this.rsvpUsers.splice(0, numberToPick);
