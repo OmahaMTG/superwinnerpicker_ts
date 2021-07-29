@@ -209,8 +209,8 @@ var WinnerDraw = (function () {
         var eventID = this.getParameterByName('eventid');
         $.ajax({
             url: 'http://www.omahamtg.com/Admin/WinnerPicker/GetRsvps?eventid=' + eventID,
-            dataType: 'jsonp',
-            async: false,
+         //   dataType: 'jsonp',
+        //    async: false,
             success: this.ajaxSuccess
         });
     }
